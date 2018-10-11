@@ -38,12 +38,15 @@
 
   const todos = module.context.collection('todos');
   const users = module.context.collection('users');
+  const fishdatas = module.context.collection('fishdatas');
 
   var Todo = require("./models/todo").Model,
     joi = require('joi'),
     todoId = joi.string().description("The id of the Todo-Item");
   var User = require("./models/user").Model,
     userId = joi.string().description("The id of the User");
+  var FishData = require("./models/fishdata").Model,
+    fishdataId = joi.string().description("The id of the FishData");
 
   /** Lists of all Todos
    *
@@ -86,7 +89,7 @@
     res.json({ success: true });
   }).pathParam("id", todoId);
 
-    /** Lists of all Users
+   /** Lists of all Users
    *
    * This function simply returns the list of all users.
    */
@@ -126,4 +129,45 @@
     users.remove(req.param("id"));
     res.json({ success: true });
   }).pathParam("id", userId);
+
+     /** Lists of all FishDatas
+   *
+   * This function simply returns the list of all fishdatas.
+   */
+
+  router.get('/ayeaye/fishdatas', function (req, res) {
+    res.json(_.map(fishdatas.toArray(), function (fishdata) {
+      return _.omit(fishdata, [ '_rev', '_id', '_oldRev' ]);
+    }));
+  });
+
+  /** Creates a new FishData
+   *
+   * Creates a new FishData. The information has to be in the
+   * requestBody.
+   */
+
+  router.post('/ayeaye/fishdatas', function (req, res) {
+    res.json(_.omit(fishdatas.insert(req.body), [ '_rev', '_id' ]));
+  }).body(FishData);
+
+
+  /** Updates a FishData
+   *
+   * Changes a FishData. The information has to be in the
+   * requestBody.
+   */
+  router.put('/ayeaye/fishdata/:id', function (req, res) {
+    res.json(_.omit(fishdatas.replace(req.param("id"), req.body), [ '_rev', '_id', '_oldRev' ]));
+  }).pathParam("id", fishdataId).body(FishData);
+
+  /** Removes a FishData
+   *
+   * Removes a FishData.
+   */
+
+  router.delete('/ayeaye/fishdatas/:id', function (req, res) {
+    fishdatas.remove(req.param("id"));
+    res.json({ success: true });
+  }).pathParam("id", fishdataId);
 }());
